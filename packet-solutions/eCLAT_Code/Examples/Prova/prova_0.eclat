@@ -1,0 +1,23 @@
+from hike import encap, monitor, routing
+
+#commento
+
+encap_config = 3     #commento
+encap_param = 1
+
+def myChain():
+    ip_type = 0xcafe
+    
+    if encap_config == 3:
+        a = 2
+        if a == 2:
+            a = 3
+        else:
+            a = 250
+j = 4 + 5 * 3 
+y = j * j
+   # z = 5 >> 2          # Shift dx di 2 posizioni: 00101 --> 00001
+   # a = 5 >> 0x02       # Shift dx di 2 posizioni: 00101 --> 00001
+   # b = 5 << 2          # Shift sx di 2 posizioni: 00101 --> 10100
+   # c = 5 & 2           # AND: 00101 & 00010 --> 00000 --> 0
+   # d = 5 | 2           # AND: 00101 & 00010 --> 00111 --> 7

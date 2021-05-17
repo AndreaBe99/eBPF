@@ -1,0 +1,15 @@
+from srv6 import encap, monitor
+
+encap_config = 1
+encap_param = 1
+
+def myChain():
+    ip_type = packet(3, 8)
+    #ip_type = 0xcafe
+
+    if ip_type == 0xcafe:
+        res = encap(encap_param)
+        if res == true: 
+            monitor()
+        else: 
+            return

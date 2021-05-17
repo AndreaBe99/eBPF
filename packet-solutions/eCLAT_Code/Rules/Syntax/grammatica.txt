@@ -1,0 +1,72 @@
+main : program
+
+program : statement_full
+            |   statement_full program
+
+block : INDENT blocks DEDENT
+
+blocks: statement_full
+            |   statement_full blocks
+
+statement_full : statement NEWLINE
+            |   statement $end
+            |   statement
+
+statement : expression
+            |   FROM IDENTIFIER IMPORT arglist
+            |   IMPORT arglist
+            |   IDENTIFIER = expression
+            |   DEF IDENTIFIER ( arglist ) : NEWLINE block
+            |   DEF IDENTIFIER ( ) : NEWLINE block
+
+arglist : IDENTIFIER
+            |   IDENTIFIER , arglist
+
+expression: IF expression : NEWLINE block else_stmt
+            |   IF expression : NEWLINE block
+            |   expression : IF expression : statement NEWLINE else_stmt
+            |   expression : IF expression : statement_full
+            |   expression : WHILE expression : NEWLINE block 
+            |   RETURN
+            |   RETURN expression
+            |   const
+            |   IDENTIFIER
+            |   IDENTIFIER ( )
+            |   IDENTIFIER . IDENTIFIER ( )
+            |   IDENTIFIER ( expressionlist )
+            |   IDENTIFIER . IDENTIFIER ( expressionlist )
+            |   [ expression ]
+            |   [ expressionlist ]
+            |   ( expression )
+            |   NOT expression
+            |   ~ expression
+            |   expression PLUS expression
+            |   expression MINUS expression
+            |   expression MUL expression
+            |   expression DIV expression
+            |   expression != expression
+            |   expression == expression
+            |   expression >= expression
+            |   expression <= expression
+            |   expression > expression
+            |   expression < expression
+            |   expression AND expression
+            |   expression OR expression
+            |   expression & expression
+            |   expression PIPE expression
+            |   expression ^ expression
+            |   expression >> expression
+            |   expression << expression
+
+else_stmt : ELSE : statement_full
+            |   ELSE : NEWLINE block
+
+const : FLOAT
+            |   BOOLEAN
+            |   INTEGER
+            |   HEX
+            |   STRING
+
+expressionlist: expression
+            |   expression ,
+            |   expression , expressionlist

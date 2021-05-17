@@ -1,0 +1,29 @@
+from hike import drop, allow
+from net import Packet
+
+__eth_proto_type_abs_off = 12
+__ipv6_hop_lim_abs_off = 21
+
+def mychain4():
+    allow = 1
+    eth_type = Packet.readU16(__eth_proto_type_abs_off)
+
+    if eth_type == 0x800 :
+        allow = 0
+        mychain5(allow, eth_type)
+        return
+
+    if eth_type == 0x86dd :
+        hop_lim = Packet.readU16(__ipv6_hop_lim_abs_off)
+        if hop_lim != 64:
+            mychain5(allow, eth_type)
+            return
+        Packet.writeU8(__ipv6_hop_lim_abs_off,17) 
+    
+
+def mychain5(allow, eth_type):
+    if allow == true:
+        prog_id = allow()
+    else:
+        prog_id = drop()
+    prog_id(eth_type)

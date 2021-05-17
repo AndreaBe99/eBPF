@@ -1,0 +1,12 @@
+from hike import drop, allow
+#from net import Packet
+
+def mychain3():
+    eth_type = Packet.readU16(12)
+    a = 0
+
+    if a == 5: 
+        b = 1
+    else: 
+        b = 2
+

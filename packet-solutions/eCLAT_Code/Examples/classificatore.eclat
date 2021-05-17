@@ -1,0 +1,77 @@
+##########################  SCENARIO  ###############################
+#                                                                   #
+# Ci sarà qualcuno che classificherà dei pacchetti in base al TOS.  #
+#                                                                   #
+# TOS:                                                              #
+#   - 4 : Mon + Fast Routing                                        #
+#   - 12: Mon + Slow Routing(verso Kernel + TC)                     #
+#   - 16: TTL + chain2:(MON+SLOW) * (Non ricalcola il Checksum)     #
+#   - 28: Fast Routing                                              #
+#                                                                   #
+# Il nodo eCLAT/HIKe riceverà questi pacchetti e attiverà una       #
+# catena in base al numero. Dove “Mon” conta i pacchetti che hanno  #
+# un determinato TOS.                                               #
+#                                                                   #
+#               N1 ------------ N2 ------------ N3                  #
+#               ^               ^               ^                   #
+#               |               |               |                   #
+#            Marca TOS        eCLAT       Riceve/Tcpdump            #
+#            (Linux)         (eBPF)         (Linux)                 #
+#####################################################################
+
+from net import Packet
+from hike import allow, mon, slow, fast
+
+
+__offset_ttl = 64     
+
+
+def chain1(tos: s16):
+    cnt: u32 = mon(tos)
+    if (cnt < 1000):
+        fast()
+    else:
+        slow()
+    return -1
+
+
+def chain2(tos: s16):
+    mon(tos)
+    slow()
+    return -1
+
+
+def chain3(tos: s16):
+    Packet.writeU8(__offset_ttl, 10)
+    # we do not evaluate the checksum here
+    chain2(tos)
+    return -1
+
+
+def chain_tos():
+    eth_type: u16 = Packet.readU16(12)
+    tos: s16 = -1
+    if (eth_type == 0x800):
+        tos = Packet.readU8(16)
+    return tos
+
+
+def chain_main():
+    tos: s16 = chain_tos()
+    if (tos < 0):
+        slow()
+        # fallback ?
+        return -1
+    # IPv4 traffic, go ahead
+    if (tos == 4):
+        chain1(tos)
+    elif (tos == 12):
+        chain2(tos)
+    elif (tos == 16):
+        chain3(tos)
+    elif (tos == 28):
+        fast()
+    else:
+        allow()
+    #fallback ?
+    return -1

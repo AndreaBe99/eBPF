@@ -1,0 +1,57 @@
+from net import Packet
+from hike import pkt_mem_move, get_time_8_bit, get_iflabel_id, get_ingress_ifindex
+
+# start_bit = 85° B = 673
+# mid_bit =   86° B = 681 
+# end_bit =   87° B = 689
+# length = 24 (8 * 3)
+
+__ipv6_start_39_byte_off = 673     # INIZIALE: 673  FINALE: 680
+__ipv6_mid_40_byte_off = 681       # INIZIALE: 681  FINALE: 688
+__ipv6_end_41_byte_off = 689       # INIZIALE: 689  FINALE: 696
+
+__ipv6_cmd_tts_off = 361        # INIZIALE: 361  FINALE: 368    Truncated PTP Rx Timestamp
+__ipv6_cmd_oif_off = 369        # INIZIALE: 369  FINALE: 380    Outgoing Interface ID
+__ipv6_cmd_oil_off = 381        # INIZIALE: 381  FINALE: 384    Outgoing Interface Load
+
+def chain_main():
+    eth_type: u16 = Packet.readU16(12)
+    if (eth_type == 0x86dd):
+        #########################################################
+        # Check if received packet has an HBH with option = PT  #
+        # PT option = 0x32 (0011 0010)                          #
+        #########################################################
+        
+        # If packet has PT option:
+        # Compute the CMD information for this node
+        pt_option : u8 = Packet.readU8(320)             # 337 bit, ovvero option_type
+        if pt_option == 0x32:
+
+            end_of_stack: u32 = Packet.readU32(__ipv6_start_39_byte_off)
+            end_of_stack = end_of_stack & 0x00ffffff
+
+            # if is empty
+            # if(HbH-PT.Stack[39:41] == 0)
+            if end_of_stack == 0x0:
+                # HbH-PT.Stack[3:41] = HbH-PT.Stack[0:38] 
+                # Shift Hbh-PT CMD Stack 3B to the right
+                pkt_mem_move(672, 361, 24)
+
+                time : u8 = get_time_8_bit()                            # 8  bit
+                ex_id : u16 = get_iflabel_id(get_ingress_ifindex())     # 12 bit
+                #in_load : u8 = interface_load(get_ingress_ifindex())   # 4  bit
+                in_load : u8 = 0                                        # 4  bit
+
+                # Push the CMD at the beginning of the Stack (i.e., HBH-PT.Stack[0:2])
+                Packet.writeU8(__ipv6_cmd_tts_off, time)
+                Packet.writeU16(__ipv6_cmd_oif_off, ex_id)
+                Packet.writeU8(__ipv6_cmd_oil_off, in_load)
+            else:
+                return 0
+        else:
+            return 0
+    else:
+        return 0
+
+
+

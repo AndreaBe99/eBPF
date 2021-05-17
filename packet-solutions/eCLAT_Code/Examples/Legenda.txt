@@ -1,0 +1,4 @@
+I file di test sono organizzati nel seguente modo:
+- "test_#.eclat"            sono i file in linguaggio eCLAT:
+- "test_#_eclat_code.c"     è il file .c generato dall'esecuzione di eCLAT;
+- "test_#_write_code.c"     è il file .c contenete il codice scritto a mano, da confrontare con il file precedente.

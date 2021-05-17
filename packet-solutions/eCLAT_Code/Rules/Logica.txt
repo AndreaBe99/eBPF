@@ -1,0 +1,37 @@
+# ---------------------------------------- FROM / IMPORT -------------------------------------- #
+# Quando faccio l'IMPORT (per ADESSO) se il from è:                                             #
+# - NET import PACKET scrivo in un dict (Appoggio.funzioni) tutte le funzioni di Packet;        #
+# - HIKE controllo che tutti i programmi importati siano presenti in un dict                    #                   
+#   (Appoggio.funzioni_eclat) il cui contenuto è creato leggendo il file eclat_program_list.csv #
+# --------------------------------------------------------------------------------------------- #
+
+
+# ------------------------------------- DEFINIRE VARIABILI ------------------------------------ #
+# Quando assegno una variabile per la prima volta significa che la sto dichiarando,             #
+# PER DEFINIRE IL TIPO (u8, u16, u32, u64, i valori MIN e MAX sono basati su: from 0 to 2ⁿ-1)   #
+# devo vedere il valore della parte destra:                                                     #
+# - se è una Call vedo se è una Read/Write e assegno il tipo corrispettivo, se invece è una     #
+#   chiamata ad un programma eCLAT o una chain il valore di default (PER ADESSO) è u32;         #
+# - se è un numero vedo la grandezza con la formula;                                            #
+# - se è una BinaryOp la eseguo e vedo il risultato;                                            #
+# - altrimenti la assegno a u64.                                                                #
+#                                                                                               #
+# PER I PARAMETRI DELLE CHAIN invce per ora non ho modo di definire il tipo quindi sono di      #
+# default impostati a u64.                                                                      #
+# --------------------------------------------------------------------------------------------- #
+
+
+# ----------------------------------------- HIKE CHAIN ---------------------------------------- #
+# Le chain definite nel file .eclat vengono registrate nel file registry.csv nel quale vengono  #
+# riportati tre valori per chain:                                                               #
+# - nome chain;                                                                                 #
+# - nome chain in maiuscolo;                                                                    #
+# - contaore, inizia da 64 (hardcodato nella variabile count nella classe Program in ast.py)    #
+#                                                                                               #
+# Le chain vengono tradotte in c mettendo la stringa "HIKE_CHAIN", seguita dalle parentesi tonde#
+# al cui interno vengono riportati i parametri, come primo parametro viene sempre inserito l'ID #
+# della chain. ESEMPIO:                                                                         #
+# - def mychain1(allow) ==> HIKE_CHAIN(HIKE_CHAIN_MYCHAIN1_ID, __u64 allow)                     #
+#                                                                                               #
+# Il numero massimo di PARAMETRI da passare in una chian è 4                                    #
+# --------------------------------------------------------------------------------------------- #

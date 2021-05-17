@@ -1,0 +1,28 @@
+from srv6 import encap, monitor
+from net import routing
+
+fast_no_kernel = 1
+
+
+def myChain1():
+    a = encap(0x01)
+    if a == 0x17:
+        monitor(1, 2)
+    else:
+        encap(1)
+    b = routing(fast_no_kernel)
+    if b == 0x15:
+        fake_prog()
+
+def myChain3():
+    encap(1)
+
+def myChain2():
+    a = 0
+    while a < 5:
+        encap(a)
+        monitor(2)
+        a = a + 1
+        b = routing(fast_no_kernel)
+        if b == 0x15:
+            fake_prog(0)
